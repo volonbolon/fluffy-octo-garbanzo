@@ -1,5 +1,6 @@
 from table import Table
 from record import Record
+import pmf
 
 class Pregnancy(Record):
     """Represents a pregnancy."""
@@ -89,3 +90,44 @@ class Pregnancies(Table):
         table = Table()
         table.records = [p.prglength for p in self.records]
         return table.standard_deviation()
+
+    def early(self, first=True):
+        if first:
+            first, _ = self.partition_between_first_and_others()
+            pr_lengths = [p.prglength for p in first.records]
+        else:
+            _, others = self.partition_between_first_and_others()
+            pr_lengths = [p.prglength for p in others.records]
+        test_pmf = pmf.make_pmf_from_list(pr_lengths)
+        prob_early = test_pmf.probability_in_range(37)
+
+        return prob_early
+
+    def on_time(self, first=True):
+        if first:
+            first, _ = self.partition_between_first_and_others()
+            pr_lengths = [p.prglength for p in first.records]
+        else:
+            _, others = self.partition_between_first_and_others()
+            pr_lengths = [p.prglength for p in others.records]
+        test_pmf = pmf.make_pmf_from_list(pr_lengths)
+        prob_lower = test_pmf.probability_in_range(37)
+        prob_upper = test_pmf.probability_in_range(40)
+        prob_on_time = prob_upper - prob_lower
+
+        return prob_on_time
+
+    def late(self, first=True):
+        if first:
+            first, _ = self.partition_between_first_and_others()
+            pr_lengths = [p.prglength for p in first.records]
+        else:
+            _, others = self.partition_between_first_and_others()
+            pr_lengths = [p.prglength for p in others.records]
+        test_pmf = pmf.make_pmf_from_list(pr_lengths)
+        longest = sorted(pr_lengths, reverse=True)[0]
+        prob_lower = test_pmf.probability_in_range(40)
+        prob_upper = test_pmf.probability_in_range(longest)
+        prob_late = prob_upper - prob_lower
+
+        return prob_late
