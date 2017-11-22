@@ -89,6 +89,15 @@ class _DictWrapper(object):
         """Returns the largest frequency/probability in the map."""
         return max(self.d.values())
 
+    def conditional(self, filter, name='Conditional'):
+        conditional_pmf = self.copy(name)
+        vals = [v for v in self.values() if filter(v)]
+        for v in vals:
+            conditional_pmf.remove(val)
+        conditional_pmf.normalize()
+        return conditional_pmf
+
+
 
 class Histogram(_DictWrapper):
     """Represents a histogram, which is a map from values to frequencies.

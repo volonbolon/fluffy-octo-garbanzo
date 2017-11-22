@@ -153,3 +153,23 @@ class Pregnancies(Table):
         rounded_relative_risk = round(relative_risk, 2)
         return rounded_relative_risk
 
+    def conditional_probability(self, threshold, first=True):
+        if first:
+            first, _ = self.partition_between_first_and_others()
+            pr_lengths = [p.prglength for p in first.records]
+        else:
+            _, others = self.partition_between_first_and_others()
+            pr_lengths = [p.prglength for p in others.records]
+
+        if threshold not in pr_lengths:
+            raise(ValueError)
+        test_pmf = pmf.make_pmf_from_list(pr_lengths)
+
+        values_to_remove = [k for k in test_pmf.values() if k < threshold]
+        for v in values_to_remove:
+            test_pmf.set(v, 0.0)
+        test_pmf.normalize()
+
+        cp = test_pmf.prob(threshold)
+
+        return cp

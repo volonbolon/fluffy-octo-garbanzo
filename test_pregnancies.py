@@ -98,3 +98,8 @@ class TestPregnancies(TestCase):
         relative_risk = pregs.relative_risk(length=Pregnancies.Lengths.LATE)
         self.assertAlmostEqual(relative_risk, 1.66) # +66%
 
+    def test_conditional_prob_first(self):
+        pregs = Pregnancies()
+        pregs.read_records()
+        conditional_probability = pregs.conditional_probability(threshold=39, first=True)
+        self.assertAlmostEqual(conditional_probability, 0.6336930455635491)
