@@ -1,12 +1,17 @@
 from table import Table
 from record import Record
 import pmf
+from enum import Enum
 
 class Pregnancy(Record):
     """Represents a pregnancy."""
 
 class Pregnancies(Table):
     """Contains survey data about a Pregnancy."""
+    class Lengths(Enum):
+        EARLY = 0
+        ON_TIME = 1
+        LATE = 2
 
     def read_records(self, data_dir='.', n=None):
         filename = self.get_filename()
@@ -131,3 +136,20 @@ class Pregnancies(Table):
         prob_late = prob_upper - prob_lower
 
         return prob_late
+
+    def relative_risk(self, length=Lengths.ON_TIME):
+        if length is Pregnancies.Lengths.EARLY:
+            prob_early_first = self.early(first=True)
+            prob_early_others = self.early(first=False)
+            relative_risk = (prob_early_first * 100.0) / (prob_early_others * 100.0)
+        elif length is Pregnancies.Lengths.ON_TIME:
+            prob_on_time_first = self.on_time(first=True)
+            prob_on_time_others = self.on_time(first=False)
+            relative_risk = (prob_on_time_first * 100.0) / (prob_on_time_others * 100.0)
+        else:
+            prob_late_first = self.late(first=True)
+            prob_late_others = self.late(first=False)
+            relative_risk = (prob_late_first * 100.0) / (prob_late_others * 100.0)
+        rounded_relative_risk = round(relative_risk, 2)
+        return rounded_relative_risk
+

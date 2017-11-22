@@ -79,3 +79,22 @@ class TestPregnancies(TestCase):
         pregs.read_records()
         prob_late = pregs.late(first=False)
         self.assertAlmostEqual(prob_late, 0.0937697994)
+
+    def test_relative_risk_early(self):
+        pregs = Pregnancies()
+        pregs.read_records()
+        relative_risk = pregs.relative_risk(length=Pregnancies.Lengths.EARLY)
+        self.assertAlmostEqual(relative_risk, 1.08) # +8%
+
+    def test_relative_risk_on_time(self):
+        pregs = Pregnancies()
+        pregs.read_records()
+        relative_risk = pregs.relative_risk(length=Pregnancies.Lengths.ON_TIME)
+        self.assertAlmostEqual(relative_risk, 0.9) # -10%
+
+    def test_relative_risk_late(self):
+        pregs = Pregnancies()
+        pregs.read_records()
+        relative_risk = pregs.relative_risk(length=Pregnancies.Lengths.LATE)
+        self.assertAlmostEqual(relative_risk, 1.66) # +66%
+
